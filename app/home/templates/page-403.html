@@ -1,0 +1,72 @@
+{% extends "layouts/base-fullscreen.html" %}
+
+{% block title %} Error 403 {% endblock %} 
+
+<!-- Element injected in the BODY element -->
+{% block body_class %} login-page {% endblock body_class %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+  <!-- icheck bootstrap -->
+  <link rel="stylesheet" href="/static/assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="login-box">
+
+    <div class="login-logo">
+        <a target="_blank" rel="noopener noreferrer" 
+           href="/">TA <b>LoS</a>
+    </div>
+
+    <h4 class="text-center" style="color: rgb(218, 209, 209);" style="font-size: 10px">
+      <b>TA</b> <b>Lo</b>ra for <b>S</b>urveillance System
+    </h4>
+
+    <br />
+
+    <!-- /.login-logo -->
+    <div class="card">
+
+      <div class="card-body login-card-body">
+
+        <h5 class="login-box-msg">
+          Error 403 - Akses Ditolak
+        </h5>
+        <p class="login-box-msg">
+          Authentikasi Diperlukan Untuk Akses Laman ini 
+          - Silahkan <a href="{{ url_for('base_blueprint.login') }}" class="text-center">Masuk</a>
+        </p>
+
+        <br />
+        <div class="text-center">
+            Belum Memiliki Akun? <a href="{{ url_for('base_blueprint.register') }}" class="text-center">Daftar</a>
+            <br />
+        </div>
+
+      </div>
+      <!-- /.login-card-body -->
+    </div>
+
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <!-- jQuery -->
+  <script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+{% endblock javascripts %}

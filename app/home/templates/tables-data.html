@@ -1,0 +1,321 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Data Rekor {% endblock %} 
+
+<!-- Element injected in the BODY element -->
+{% block body_class %} {% endblock body_class %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="/static/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="/static/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+
+{% endblock stylesheets %}
+
+{% block content %} 
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Data Rekor</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/index2.html">Beranda</a></li>
+              <li class="breadcrumb-item active">Data Rekor</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+          <div class="card card-primary">
+            <div class="card-header">
+              <h3 class="card-title">Pilih Tanggal</h3>
+            </div>
+            <div class="card-body">
+              <div class="row"> 
+                <form id="datetime_range" class="form-row" style="width: 100%;" action="/tables_data" method="GET"> 
+                  <div class="col-12 col-sm-6 col-md-3">
+                    <label for="for">Mulai</label>
+                    <input class="u-full-width" id="datetimepicker1"  type="text" value="{{from_date}}" name="from">
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-12 col-sm-6 col-md-3">
+                    <label for="to">Sampai</label>
+                    <input class="u-full-width" id="datetimepicker2"  type="text" value="{{to_date}}" name="to">
+                  </div>
+                  <!-- /.col -->
+                  <!-- fix for small devices only -->
+                  <div class="clearfix hidden-md-up"></div>
+                  <div class="col-12 col-sm-6 col-md-3">
+                    <input type="hidden" class="timezone" name="timezone" />
+                    <input class="btn btn-block btn-primary" type="submit" value="Tampilkan Data" id="submit_button" />
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-12 col-sm-6 col-md-3">
+                    <input type="hidden" class="timezone" name="timezone" />
+                    <input type="hidden" name="cond" value="byDate" />
+                    <input class="btn btn-block btn-secondary" type="submit" formaction="/download_csv" value="Download CSV" id="download_button" />
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+        <div class="row">
+          <div class="col-12">
+            <div class="card card-info">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="far fa-chart-bar"></i>
+                  Grafik Temperatur
+                </h3>
+  
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                    <i class="fas fa-expand"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="chart_temps" style="width: 100%;"></div>
+              </div>
+              <!-- /.card-body-->
+            </div>
+            <!-- /.card -->
+
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="nav-icon fas fa-table"></i>
+                  Data Temperatur
+                </h3>
+  
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <table id="example" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Temperatur (C)</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in temp %}
+                    <tr>
+                      <td>{{row[0]}}</td>
+                      <td>{{row[1]}}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
+            <div class="card card-info">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="far fa-chart-bar"></i>
+                  Grafik Kelembapan
+                </h3>
+  
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                    <i class="fas fa-expand"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="chart_hums" style="width: 100%;"></div>
+              </div>
+              <!-- /.card-body-->
+            </div>
+            <!-- /.card -->
+
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="nav-icon fas fa-table"></i>
+                  Data Kelembapan
+                </h3>
+  
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <table id="example2" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Kelembapan (%)</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in hum %}
+                    <tr>
+                      <td>{{row[0]}}</td>
+                      <td>{{row[1]}}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="nav-icon fas fa-table"></i>
+                  Data Error State
+                </h3>
+  
+                <div class="card-tools">
+                  <a href="https://jgromes.github.io/RadioLib/group__status__codes.html#ga39b71357447cf06f433d589133d61af2" class="btn btn-tool btn-sm">
+                    <i class="fas fa-bars text-primary"></i> Status Code
+                  </a>
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <table id="example3" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Error State</th>
+                    <th>Keterangan</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in err %}
+                    <tr>
+                      <td>{{row[0]}}</td>
+                      <td>{{row[1]}}</td>
+                      <td>{{row[2]}}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div>
+      <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <!-- jQuery -->
+  <script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- DataTables -->
+  <script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="/static/assets/js/adminlte.min.js"></script>
+  <!-- AdminLTE for demo purposes -->
+  <script src="/static/assets/js/demo.js"></script>
+  <!-- page script -->
+  <script src="/static/assets/js/pages/tables-data.js"></script>
+
+
+  <!-- Datetimepicker -->
+  <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css"/ >
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+
+
+  <!-- jstimezonedetect -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.7/jstz.min.js" ></script>
+
+
+  <!-- Google Charts -->  
+  <script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}"></script>
+
+
+  <script>
+    var TempData = [
+      {% for row in temp_chart %}
+        [new Date({{row[0][0:4]}},{{row[0][5:7]}}-1,{{row[0][8:10]}},{{row[0][11:13]}},{{row[0][14:16]}}),{{row[1]}}],
+      {% endfor %}
+    ];
+    
+    var HumData = [
+      {% for row in hum_chart %}
+        [new Date({{row[0][0:4]}},{{row[0][5:7]}}-1,{{row[0][8:10]}},{{row[0][11:13]}},{{row[0][14:16]}}),{{row[1]}}],
+      {% endfor %}
+    ];
+  </script>
+
+  <script>
+  jQuery('#datetimepicker1').datetimepicker(
+    {
+        format:'Y-m-d H:i',
+        defaultDate:'{{from_date}}'
+    });
+  jQuery('#datetimepicker2').datetimepicker(
+    {
+        format:'Y-m-d H:i',
+        defaultDate:'{{to_date}}'
+    });
+  </script>
+
+  <script>
+    google.load('visualization', '1', {packages: ['corechart', 'line']});
+    google.setOnLoadCallback(drawChartTemp);  
+  </script>
+
+  <script>
+    google.load('visualization', '1', {packages: ['corechart', 'line']});
+    google.setOnLoadCallback(drawChartHum);  
+  </script>
+
+{% endblock javascripts %}

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/static/assets/favicon.ico" type="image/x-icon">
+  <link rel="canonical" href="https://appseed.us/adminlte"/>
+  
+  <title>
+    TA LoS -  Masuk
+  </title> 
+
+  <!-- Specific Page CSS goes HERE  -->  
+  
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+  <!-- icheck bootstrap -->
+  <link rel="stylesheet" href="/static/assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+
+
+
+</head>
+<body class="hold-transition  login-page ">
+
+  
+
+  <div class="login-box">
+
+    <div class="login-logo">
+        <a target="_blank" rel="noopener noreferrer" href="/"><b>TA </b>LoS</a>
+    </div>
+
+    <h4 class="text-center" style="color: rgb(218, 209, 209);" style="font-size: 10px">
+      <b>TA</b> <b>Lo</b>ra for <b>S</b>urveillance System
+    </h4>
+
+    <br />
+
+    <!-- /.login-logo -->
+    <div class="card">
+      <div class="card-body login-card-body">
+
+            <p class="login-box-msg">
+              {% if msg %}
+                  {{ msg | safe }}
+              {% else %}
+                  Masukan Username dan Password
+              {% endif %}
+        </p>
+
+        <form method="post" action="">
+
+          {{ form.hidden_tag() }}
+
+          <div class="input-group mb-3">
+            {{ form.username(placeholder="Username", class="form-control") }}
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-envelope"></span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group mb-3">
+            {{ form.password(placeholder="Password", class="form-control", type="password") }}
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-8">
+              <div class="icheck-primary">
+                <input type="checkbox" id="remember">
+                <label for="remember">
+                  Ingat Saya
+                </label>
+              </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-4">
+              <button type="submit" name="login" class="btn btn-primary btn-block">Masuk</button>
+            </div>
+            <!-- /.col -->
+          </div>
+        </form>
+
+        <br /><br />
+
+        <div class="text-center">
+            Belum Memiliki Akun? <a href="/register" class="text-center">Daftar</a>
+            <br /><br />
+            Lupa Password? <a href="{{ url_for('base_blueprint.reset_request') }}" class="text-center">Lupa Password</a>
+            <br /><br />
+        </div>
+
+      </div>
+      <!-- /.login-card-body -->
+    </div>
+
+  </div>
+
+
+
+  <!-- Specific Page JS goes HERE  -->
+  
+
+  <!-- jQuery -->
+  <script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+
+
+</body>
+</html>
+
