@@ -56,6 +56,10 @@ logging.basicConfig(level=logging.INFO)
 
 # Google Docs spreadsheet name.
 spreadsheet_name = 'sensors-data_TA'
+scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name('/var/www/TA_AdminLTE/raspberry-pi-data-logger-9434d437f6f7.json', scope)
+client = gspread.authorize(creds)
+sheet = client.open(spreadsheet_name).sheet1
 
 def log_values(sensor_id, hum, temp, err):
       conn=sqlite3.connect('/var/www/TA_AdminLTE/lab_app.db')  #It is important to provide an
@@ -67,10 +71,6 @@ def log_values(sensor_id, hum, temp, err):
         #curs.execute("""INSERT INTO humidities values(datetime(CURRENT_TIMESTAMP, 'localtime'), (?), (?))""", (sensor_id,hum))     #This will store the new record at UTC
         #curs.execute("""INSERT INTO errors values(datetime(CURRENT_TIMESTAMP, 'localtime'), (?), (?))""", (sensor_id,err))     #This will store the new record at UTC
       conn.commit()
-      scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-      creds = ServiceAccountCredentials.from_json_keyfile_name('/var/www/TA_AdminLTE/raspberry-pi-data-logger-9434d437f6f7.json', scope)
-      client = gspread.authorize(creds)
-      sheet = client.open(spreadsheet_name).sheet1
       curs.execute("""SELECT * FROM sensors WHERE uploaded IN ('0') ORDER BY rDatetime ASC""")
       results = curs.fetchall()
       for val in results : 
@@ -79,7 +79,7 @@ def log_values(sensor_id, hum, temp, err):
                   row = [val[0],val[1],"","",val[4]]
                else :
                   row = [val[0],val[1],val[2],val[3],""]
-                  #row = [strftime("%Y-%m-%d %H:%M:%S", localtime()),sensor_id,round(temp,2),round(hum,2),""]
+
                sheet.append_row(row)
             except KeyboardInterrupt :
                conn.close()
@@ -89,8 +89,6 @@ def log_values(sensor_id, hum, temp, err):
                logging.error('Unexpected error: {0}'.format(e))
             except gspread.exceptions.APIError as e :
                logging.error('Unexpected error: {0}'.format(e))
-               #kalau gagal upload diamkan uploaded tetap false 
-
             curs.execute("""UPDATE sensors SET uploaded = '1' WHERE rDatetime IN (?)""", [val[0]])
             conn.commit()
 
@@ -110,30 +108,37 @@ ser.flushInput()
 while True:
    if ser.in_waiting > 0:
       rawserial = ser.readline()
-      #time.sleep(2)
-      #cookedserial = rawserial.decode('utf-8').strip('\r\n')
-      #print(rawserial)
-      #print(humidity)
-      if rawserial[0].isdigit():
+      cookedserial = rawserial.decode('ISO-8859-1').strip('\r\n')
+      #rawserial_str = str(rawserial)
+      if cookedserial[0].isdigit():
          print("Data Sesuai!")
-         print(rawserial)
-         datasplit = rawserial.split(',')
+         print(cookedserial)
+         datasplit = cookedserial.split(',')
          humidity =  '{:.2f}'.format(float(datasplit[0]))
          temperature =  '{:.2f}'.format(float(datasplit[1]))
          print(temperature)
          print(humidity)
          log_values("1", humidity, temperature, None)
-      elif rawserial.startswith(('-', '0x')):
+      elif cookedserial.startswith(('-', '0x')):
          print("Ada Error!")
-         print(rawserial)
-         error = int(rawserial)
+         print(cookedserial)
+         error = float(cookedserial) 
          log_values("1", None, None, error)
       else:
-         print(rawserial)
-      break
-   time.sleep(0.1)
-   
+         print(cookedserial)
+      #break
+      ser.flushOutput()
+      ser.flushInput()
+   #time.sleep(0.1)
+
+
+#row = [strftime("%Y-%m-%d %H:%M:%S", localtime()),sensor_id,round(temp,2),round(hum,2),""]
+#time.sleep(2)
+#cookedserial = rawserial.decode('utf-8').strip('\r\n')
+#print(rawserial)
+#print(humidity)
 #humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 23)
+
 # If you don't have a sensor but still wish to run this program, comment out all the
 # sensor related lines, and uncomment the following lines (these will produce random
 # numbers for the temperature and humidity variables):

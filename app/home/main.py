@@ -3,7 +3,7 @@
 from app import db, login_manager
 from flask import Flask,render_template, redirect, url_for, request, Response, make_response, current_app
 import time, os, copy, datetime, sys, csv, zipfile
-from io import BytesIO
+from io import BytesIO, StringIO
 
 def get_records():
 
@@ -68,48 +68,51 @@ def zipFiles(files):
     	for i, file in enumerate(files):
             if i == 0:
                 #f.writestr(zipfile.Zipinfo("Temp.csv"), file.getvalue())
-                f.writestr("{}.csv".format("Temp"), file.getvalue())
+                f.writestr('{}.csv'.format('Temp'), file.getvalue())
             if i == 1:
-                f.writestr("{}.csv".format("Hum"), file.getvalue())
+                f.writestr('{}.csv'.format('Hum'), file.getvalue())
             if i == 2:
-                f.writestr("{}.csv".format("Err"), file.getvalue())
+                f.writestr('{}.csv'.format('Err'), file.getvalue())
     return zipped_file.getvalue()
 
 def fetch_table_data(aspect,condition):
 
     from_date_str = request.args.get('from', time.strftime(
-        "%Y-%m-%d 00:00"))  # Get the from date value from the URL
+        "%Y-%m-%d 00:00"))  
     to_date_str = request.args.get('to', time.strftime(
-        "%Y-%m-%d %H:%M"))  # Get the to date value from the URL
-    # This will return a string, if field range_h exists in the request
+        "%Y-%m-%d %H:%M"))  
 
-    # Validate date before sending it to the DB
     if not validate_date(from_date_str):
         from_date_str = time.strftime("%Y-%m-%d 00:00")
     if not validate_date(to_date_str):
-        # Validate date before sending it to the DBs
         to_date_str = time.strftime("%Y-%m-%d %H:%M")
 
-    if condition == "byDate" :
-        result = db.get_engine(bind='sensor').execute("SELECT rDatetime," + aspect + 
-                                                    " FROM sensors WHERE rDateTime BETWEEN ? AND ?", (from_date_str, to_date_str))
-        col_tile = db.get_engine(bind='sensor').execute("SELECT rDatetime," + aspect + 
-                                                    " FROM sensors WHERE rDateTime BETWEEN ? AND ?", (from_date_str, to_date_str)).keys()
-    elif condition == "byRecent" :
-        result = db.get_engine(bind='sensor').execute("SELECT rDatetime," + aspect + 
-                                                    " FROM (SELECT * FROM sensors ORDER BY rDatetime DESC LIMIT 10) ORDER BY rDatetime ASC")
-        col_tile = db.get_engine(bind='sensor').execute("SELECT rDatetime," + aspect + 
-                                                    " FROM (SELECT * FROM sensors ORDER BY rDatetime DESC LIMIT 10) ORDER BY rDatetime ASC").keys()        
+    target = aspect.decode("utf-8") 
 
-    dump_file = BytesIO()
+    if condition == b'byDate' :
+        result = db.get_engine(bind='sensor').execute('SELECT rDatetime, {} FROM sensors WHERE rDateTime BETWEEN ? AND ?'.format(target),(from_date_str, to_date_str))
+        col_title = db.get_engine(bind='sensor').execute('SELECT rDatetime, {} FROM sensors WHERE rDateTime BETWEEN ? AND ?'.format(target), (from_date_str, to_date_str)).keys()
+    elif condition == b'byRecent' :
+        result = db.get_engine(bind='sensor').execute('SELECT rDatetime, {} FROM (SELECT * FROM sensors ORDER BY rDatetime DESC LIMIT 10) ORDER BY rDatetime ASC'.format(target))
+        col_title = db.get_engine(bind='sensor').execute('SELECT rDatetime, {} FROM (SELECT * FROM sensors ORDER BY rDatetime DESC LIMIT 10) ORDER BY rDatetime ASC'.format(target)).keys()
+
+    dump_file = StringIO()
     writer = csv.writer(dump_file, delimiter=",")
-    writer.writerow(col_tile)
+    writer.writerow(col_title)
     writer.writerows(result)
-    #for row in result :
-    #    writer.writerows(result)
 
     return dump_file
+        #result = db.get_engine(bind='sensor').execute('SELECT rDatetime,' + aspect + ' FROM sensors WHERE rDateTime BETWEEN ? AND ?', (from_date_str, to_date_str))
+        #col_title = db.get_engine(bind='sensor').execute("SELECT rDatetime," + aspect + 
+                                                   # " FROM sensors WHERE rDateTime BETWEEN ? AND ?", (from_date_str, to_date_str)).keys() 
+    #else
+        #result = db.get_engine(bind='sensor').execute("SELECT rDatetime," + aspect + 
+                                                    #" FROM (SELECT * FROM sensors ORDER BY rDatetime DESC LIMIT 10) ORDER BY rDatetime ASC")
+        #col_title = db.get_engine(bind='sensor').execute("SELECT rDatetime," + aspect + 
+                                                    #" FROM (SELECT * FROM sensors ORDER BY rDatetime DESC LIMIT 10) ORDER BY rDatetime ASC").keys()   
 
+    #for row in result :
+    #    writer.writerows(result)
 def get_recents():
     temps_chart = db.get_engine(bind='sensor').execute("SELECT rDatetime, COALESCE(NULLIF(temp,''), 'null') FROM sensors ORDER BY rDatetime DESC LIMIT 10")
     hums_chart = db.get_engine(bind='sensor').execute("SELECT rDatetime, COALESCE(NULLIF(hum,''), 'null') FROM sensors ORDER BY rDatetime DESC LIMIT 10")
@@ -138,9 +141,9 @@ def get_recents():
     recent_dict = list()
     for row in recent_tables :
         if row[3] == -6 :
-            status = "Waktu Timed Out"
+            status = "Timed Out"
         elif row[3] == -7 :
-            status = "CRC Missmatch"
+            status = "CRC Mismatch"
         elif row[3] == -16 :
             status = "Kesalahan SPI"
         elif row[3] == -2 :

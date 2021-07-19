@@ -70,13 +70,13 @@ def download_csv():
     render_data()
     condz = request.args.get('cond')
     if condz == 'byDate' :
-        table_temp = fetch_table_data('temp','byDate')
-        table_hum = fetch_table_data('hum','byDate')
-        table_err = fetch_table_data('err','byDate')
+        table_temp = fetch_table_data(b'temp',b'byDate')
+        table_hum = fetch_table_data(b'hum',b'byDate')
+        table_err = fetch_table_data(b'err',b'byDate')
     else :
-        table_temp = fetch_table_data('temp','byRecent')
-        table_hum = fetch_table_data('hum','byRecent')
-        table_err = fetch_table_data('err','byRecent')        
+        table_temp = fetch_table_data(b'temp',b'byRecent')
+        table_hum = fetch_table_data(b'hum',b'byRecent')
+        table_err = fetch_table_data(b'err',b'byRecent')        
     file_List = [table_temp, table_hum, table_err]
     zipped_file = zipFiles(file_List)
     response = make_response(zipped_file)
@@ -93,7 +93,7 @@ def home_index():
     datasplit_time = times.split(' ')
     recents_time1 = datasplit_time[0]
     recents_time2 = datasplit_time[1]
-    upload_rate = (float(count_upload_data) / float(count_total_data)) * 100
+    upload_rate = '{:.2f}'.format((float(count_upload_data) / float(count_total_data)) * 100)
     return render_template(	"index2.html", 	recent_table=recents_tables,
                             temp_chart=temps_chart,
                             hum_chart=hums_chart,

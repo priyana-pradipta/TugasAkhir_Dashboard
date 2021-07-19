@@ -1,4 +1,4 @@
-#!/var/www/TA_AdminLTE/bin/python
+#!/var/www/TA_AdminLTE/bin/python3.7
 
 from lxml import etree as ET
 from lxml.etree import XMLSyntaxError

@@ -1,4 +1,4 @@
-#!/var/www/TA_AdminLTE/bin/python
+#!/var/www/TA_AdminLTE/bin/python3.7
 USAGE = """S.M.A.R.T status
 
 More user friendly smartctl status command

@@ -1,4 +1,4 @@
-#!/var/www/TA_AdminLTE/bin/python
+#!/var/www/TA_AdminLTE/bin/python3.7
 """
 Script to load and view ssh keys found from user directories
 """

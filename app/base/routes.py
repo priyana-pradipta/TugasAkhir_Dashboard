@@ -126,10 +126,10 @@ def reset_request():
             send_reset_email(user)
             #flash('An email has been sent with instructions to reset your password.', 'info')
             #return redirect(url_for('base_blueprint.login')) 
-            return render_template( 'accounts/login.html', 
+            return render_template( 'accounts/forgot-password.html', 
                                     msg='Email Reset Password Sudah Dikirim, Silahkan Cek Email',
                                     success=True,
-                                    form=login_form)    
+                                    form=request_reset_form)    
     else :
         return render_template('accounts/forgot-password.html', form=request_reset_form)
 
@@ -149,20 +149,18 @@ def reset_token(token):
         return redirect(url_for('home_blueprint.home_index'))
         
     user = User.verify_reset_token(token)
-    request_reset_form = RequestResetForm(request.form)
+    #request_reset_form = RequestResetForm(request.form)
     reset_password_form = ResetPasswordForm(request.form)
     if user is None:
         #flash('That is an invalid or expired token', 'warning')
-        return render_template( 'accounts/forgot-password.html', 
-                                msg='Token Salah atau Kadaluwarsa',
-                                success=False,
-                                form=request_reset_form)
+        return render_template('accounts/error_token.html')
+        #return redirect(url_for('base_blueprint.reset_request', msg='Token Salah atau Kadaluwarsa, Request Ulang Email <a href="/forgot_password">Di Sini</a>'))
     else :
         if reset_password_form.validate_on_submit():
 
             password     = request.form['password'   ]
 
-            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+            hashed_password = bcrypt.generate_password_hash(password) #bcrypt.generate_password_hash(password).decode('utf-8')
             user.password = hashed_password
             db.session.commit()
             #flash('Your password has been updated! You are now able to log in', 'success')
