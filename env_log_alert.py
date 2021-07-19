@@ -16,8 +16,8 @@ logging.basicConfig(level=logging.INFO)
 
 # Google Docs spreadsheet name.
 spreadsheet_name = 'sensors-data_TA'
-account_sid = os.getenv('TWILIO_ACCOUNT_SID') #'AC5cadcf435cb0ef40929a86677e341936'
-auth_token = os.getenv('TWILIO_AUTH_TOKEN') #'e2e9009e6ceb35603c50bb6149c1c5ef'
+account_sid = os.getenv('TWILIO_ACCOUNT_SID') 
+auth_token = os.getenv('TWILIO_AUTH_TOKEN') 
 client = Client(account_sid, auth_token)
 
 def sent_alert(temp):
@@ -29,11 +29,9 @@ def sent_alert(temp):
                             )
         date_sent = datetime.datetime.now()
         os.environ['LAST_SENT'] = str(date_sent)
-        #tulis ke env variabel  'LAST_SENT'
     else : #last_sent is not None
         date_now = datetime.datetime.now()
         datetime_last = dateutil.parser.parse(last_sent)
-        #datetime_last = datetime.strptime(last_sent, "%d/%m/%y %H:%M:%S.%f")
         difference = date_now - datetime_last
         delta = difference // datetime.timedelta(seconds=1)
         int_delta = int(delta)
@@ -46,17 +44,10 @@ def sent_alert(temp):
                             )
             date_sent = datetime.datetime.now()
             os.environ['LAST_SENT'] = str(date_sent)
-        #else :
-            #return None
-    #else :
-        #return None
 
 
 def log_values(sensor_id, hum, temp, err):
-      conn=sqlite3.connect('/var/www/TA_AdminLTE/lab_app.db')  #It is important to provide an
-							     #absolute path to the database
-							     #file, otherwise Cron won't be
-							     #able to find it!
+      conn=sqlite3.connect('/var/www/TA_AdminLTE/lab_app.db')  
       curs=conn.cursor()
       curs.execute("""INSERT INTO sensors values(datetime(CURRENT_TIMESTAMP, 'localtime'), (?), (?), (?), (?), 0)""", (sensor_id,hum,temp,err))  #This will store the new record at UTC
       conn.commit()
@@ -128,20 +119,6 @@ while True:
    #time.sleep(0.1)
 
 
-#row = [strftime("%Y-%m-%d %H:%M:%S", localtime()),sensor_id,round(temp,2),round(hum,2),""]
-#time.sleep(2)
-#cookedserial = rawserial.decode('utf-8').strip('\r\n')
-#print(rawserial)
-#print(humidity)
-#humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 23)
 
-# If you don't have a sensor but still wish to run this program, comment out all the
-# sensor related lines, and uncomment the following lines (these will produce random
-# numbers for the temperature and humidity variables):
-# import random
-# humidity = random.randint(1,100)
-# temperature = random.randint(10,30)
-#if humidity is not None and temperature is not None:
-#	log_values("1", temperature, humidity)
-#else:
-#	log_values("1", -999, -999)
+
+

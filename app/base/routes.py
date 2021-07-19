@@ -59,9 +59,7 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for('home_blueprint.home_index'))
 
-    #login_form = LoginForm(request.form)
     create_account_form = CreateAccountForm(request.form)
-    #if 'register' in request.form:
     if create_account_form.validate_on_submit():
         username  = request.form['username']
         email     = request.form['email'   ]
@@ -117,15 +115,12 @@ def reset_request():
 
         user = User.query.filter_by(email=email).first()
         if user is None:
-            #raise ValidationError('There is no account with that email. You must register first.')
             return render_template( 'accounts/forgot-password.html', 
                                     msg='Email tidak terdaftar, Register Dahulu',
                                     success=False,
                                     form=request_reset_form)
         else :
             send_reset_email(user)
-            #flash('An email has been sent with instructions to reset your password.', 'info')
-            #return redirect(url_for('base_blueprint.login')) 
             return render_template( 'accounts/forgot-password.html', 
                                     msg='Email Reset Password Sudah Dikirim, Silahkan Cek Email',
                                     success=True,
@@ -149,12 +144,9 @@ def reset_token(token):
         return redirect(url_for('home_blueprint.home_index'))
         
     user = User.verify_reset_token(token)
-    #request_reset_form = RequestResetForm(request.form)
     reset_password_form = ResetPasswordForm(request.form)
     if user is None:
-        #flash('That is an invalid or expired token', 'warning')
         return render_template('accounts/error_token.html')
-        #return redirect(url_for('base_blueprint.reset_request', msg='Token Salah atau Kadaluwarsa, Request Ulang Email <a href="/forgot_password">Di Sini</a>'))
     else :
         if reset_password_form.validate_on_submit():
 
@@ -163,7 +155,6 @@ def reset_token(token):
             hashed_password = bcrypt.generate_password_hash(password) #bcrypt.generate_password_hash(password).decode('utf-8')
             user.password = hashed_password
             db.session.commit()
-            #flash('Your password has been updated! You are now able to log in', 'success')
             return render_template( 'accounts/recover-password.html', 
                                     msg='Password Sudah Diganti, Silahkan <a href="/login">Masuk</a>', 
                                     success=True,

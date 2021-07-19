@@ -1,5 +1,4 @@
 
-
 from app import db, login_manager
 from flask import Flask,render_template, redirect, url_for, request, Response, make_response, current_app
 import time, os, copy, datetime, sys, csv, zipfile
@@ -11,7 +10,6 @@ def get_records():
         "%Y-%m-%d 00:00"))  # Get the from date value from the URL
     to_date_str = request.args.get('to', time.strftime(
         "%Y-%m-%d %H:%M"))  # Get the to date value from the URL
-    # This will return a string, if field range_h exists in the request
 
     # Validate date before sending it to the DB
     if not validate_date(from_date_str):
@@ -50,14 +48,12 @@ def get_records():
 
     return [temperatures, humidities, error_dict, temps_chart, hums_chart, from_date_str, to_date_str]
 
-
 def validate_date(d):
     try:
         datetime.datetime.strptime(d, '%Y-%m-%d %H:%M')
         return True
     except ValueError:
         return False
-
 
 def render_data():
     return redirect(url_for('home_blueprint.tables_data'))
@@ -102,17 +98,7 @@ def fetch_table_data(aspect,condition):
     writer.writerows(result)
 
     return dump_file
-        #result = db.get_engine(bind='sensor').execute('SELECT rDatetime,' + aspect + ' FROM sensors WHERE rDateTime BETWEEN ? AND ?', (from_date_str, to_date_str))
-        #col_title = db.get_engine(bind='sensor').execute("SELECT rDatetime," + aspect + 
-                                                   # " FROM sensors WHERE rDateTime BETWEEN ? AND ?", (from_date_str, to_date_str)).keys() 
-    #else
-        #result = db.get_engine(bind='sensor').execute("SELECT rDatetime," + aspect + 
-                                                    #" FROM (SELECT * FROM sensors ORDER BY rDatetime DESC LIMIT 10) ORDER BY rDatetime ASC")
-        #col_title = db.get_engine(bind='sensor').execute("SELECT rDatetime," + aspect + 
-                                                    #" FROM (SELECT * FROM sensors ORDER BY rDatetime DESC LIMIT 10) ORDER BY rDatetime ASC").keys()   
 
-    #for row in result :
-    #    writer.writerows(result)
 def get_recents():
     temps_chart = db.get_engine(bind='sensor').execute("SELECT rDatetime, COALESCE(NULLIF(temp,''), 'null') FROM sensors ORDER BY rDatetime DESC LIMIT 10")
     hums_chart = db.get_engine(bind='sensor').execute("SELECT rDatetime, COALESCE(NULLIF(hum,''), 'null') FROM sensors ORDER BY rDatetime DESC LIMIT 10")

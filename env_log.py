@@ -1,50 +1,5 @@
 #!/usr/bin/env python
 
-'''
-
-FILE NAME
-env_log.py
-
-1. WHAT IT DOES
-Takes a reading from a DHT sensor and records the values in an SQLite3 database using a Raspberry Pi.
-
-2. REQUIRES
-* Any Raspberry Pi
-* A DHT sensor
-* A 10kOhm resistor
-* Jumper wires
-* Appropriate Google API credentials for Google Drive and Google Sheet.
-
-3. ORIGINAL WORK
-Raspberry Full stack 2015, Peter Dalmaris
-
-4. HARDWARE
-D17: Data pin for sensor
-
-5. SOFTWARE
-Command line terminal
-Simple text editor
-Libraries:
-import sqlite3
-import sys
-import Adafruit_DHT
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-
-6. WARNING!
-None
-
-7. CREATED
-
-8. TYPICAL OUTPUT
-No text output. Two new records are inserted in the database and in a Google Sheet when the script is executed
-
- // 9. COMMENTS
---
-
- // 10. END
-
-'''
 import sqlite3
 import serial, string, time
 import sys
@@ -62,14 +17,9 @@ client = gspread.authorize(creds)
 sheet = client.open(spreadsheet_name).sheet1
 
 def log_values(sensor_id, hum, temp, err):
-      conn=sqlite3.connect('/var/www/TA_AdminLTE/lab_app.db')  #It is important to provide an
-							     #absolute path to the database
-							     #file, otherwise Cron won't be
-							     #able to find it!
+      conn=sqlite3.connect('/var/www/TA_AdminLTE/lab_app.db')
       curs=conn.cursor()
-      curs.execute("""INSERT INTO sensors values(datetime(CURRENT_TIMESTAMP, 'localtime'), (?), (?), (?), (?), 0)""", (sensor_id,hum,temp,err))  #This will store the new record at UTC
-        #curs.execute("""INSERT INTO humidities values(datetime(CURRENT_TIMESTAMP, 'localtime'), (?), (?))""", (sensor_id,hum))     #This will store the new record at UTC
-        #curs.execute("""INSERT INTO errors values(datetime(CURRENT_TIMESTAMP, 'localtime'), (?), (?))""", (sensor_id,err))     #This will store the new record at UTC
+      curs.execute("""INSERT INTO sensors values(datetime(CURRENT_TIMESTAMP, 'localtime'), (?), (?), (?), (?), 0)""", (sensor_id,hum,temp,err))
       conn.commit()
       curs.execute("""SELECT * FROM sensors WHERE uploaded IN ('0') ORDER BY rDatetime ASC""")
       results = curs.fetchall()
@@ -126,26 +76,7 @@ while True:
          log_values("1", None, None, error)
       else:
          print(cookedserial)
-      #break
       ser.flushOutput()
       ser.flushInput()
    #time.sleep(0.1)
 
-
-#row = [strftime("%Y-%m-%d %H:%M:%S", localtime()),sensor_id,round(temp,2),round(hum,2),""]
-#time.sleep(2)
-#cookedserial = rawserial.decode('utf-8').strip('\r\n')
-#print(rawserial)
-#print(humidity)
-#humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 23)
-
-# If you don't have a sensor but still wish to run this program, comment out all the
-# sensor related lines, and uncomment the following lines (these will produce random
-# numbers for the temperature and humidity variables):
-# import random
-# humidity = random.randint(1,100)
-# temperature = random.randint(10,30)
-#if humidity is not None and temperature is not None:
-#	log_values("1", temperature, humidity)
-#else:
-#	log_values("1", -999, -999)

@@ -1,19 +1,6 @@
 import serial, string, time
 import sqlite3
 
-#!/usr/bin/env python3
-
-#In this example /dev/ttyUSB0 is used
-#This may change in your case to /dev/ttyUSB1, /dev/ttyUSB2, etc.
-
-
-#The following block of code works like this:
-#If serial data is present, read the line, decode the UTF8 data,
-#...remove the trailing end of line characters
-#...split the data into temperature and humidity
-#...remove the starting and ending pointers (< >)
-#...print the output
-
 import serial
 if __name__ == '__main__':
     ser = serial.Serial(
@@ -31,7 +18,6 @@ if __name__ == '__main__':
         if ser.in_waiting > 0:
             rawserial = ser.readline()
             time.sleep(2)
-            #cookedserial = rawserial.decode('utf-8').strip('\r\n')
             if rawserial[0].isdigit():
                 print("Data Sesuai!")
                 datasplit = rawserial.split(',')
